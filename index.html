@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05070d">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23070b14'/%3E%3Cpath%20d='M32%2012L52%2032L32%2052L12%2032Z'%20fill='none'%20stroke='%233ee6f0'%20stroke-width='3'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='6'%20fill='%238b6cf6'/%3E%3C/svg%3E">
+<title>Crispp 一周工作台</title>
+<style>
+  :root{
+    --bg:#05070e; --bg-2:#080d18;
+    --card:rgba(15,23,40,.78); --card-2:rgba(10,16,28,.85);
+    --ink:#dbe7fb; --sub:#7e8dad;
+    --line:rgba(110,190,255,.14); --line-2:rgba(110,190,255,.26);
+    --accent:#3ee6f0; --accent-2:rgba(62,230,240,.09);
+    --vio:#8b6cf6; --ok:#2ee6a8;
+    --warm:#8ea8ff; --warm-2:rgba(90,140,255,.12);
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{background:#05070e}
+  body{
+    margin:0;color:var(--ink);min-height:100vh;
+    background:
+      radial-gradient(820px 460px at 50% -180px,rgba(62,230,240,.18),transparent 68%),
+      radial-gradient(680px 420px at 106% 8%,rgba(139,108,246,.16),transparent 62%),
+      linear-gradient(180deg,#05070e 0%,#070b15 45%,#05070e 100%);
+    background-repeat:no-repeat;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-text-size-adjust:100%;
+    -webkit-font-smoothing:antialiased;
+  }
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg i.band{
+    position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;
+    will-change:transform;
+  }
+  .b1{
+    width:130vw;height:48vh;left:-26vw;top:-10vh;
+    background:radial-gradient(closest-side,rgba(62,230,240,.30),rgba(62,230,240,.09) 56%,transparent 72%);
+    animation:flow1 26s ease-in-out infinite alternate;
+  }
+  .b2{
+    width:118vw;height:42vh;right:-32vw;top:20vh;
+    background:radial-gradient(closest-side,rgba(139,108,246,.28),rgba(139,108,246,.08) 56%,transparent 72%);
+    animation:flow2 34s ease-in-out infinite alternate;
+  }
+  .b3{
+    width:124vw;height:40vh;left:-12vw;bottom:-14vh;
+    background:radial-gradient(closest-side,rgba(87,185,255,.22),rgba(62,230,240,.07) 56%,transparent 74%);
+    animation:flow3 30s ease-in-out infinite alternate;
+  }
+  @keyframes flow1{
+    0%{transform:translate3d(0,0,0) rotate(-10deg) scale(1)}
+    100%{transform:translate3d(7vw,5vh,0) rotate(-3deg) scale(1.14)}
+  }
+  @keyframes flow2{
+    0%{transform:translate3d(0,0,0) rotate(8deg) scale(1.05)}
+    100%{transform:translate3d(-9vw,-6vh,0) rotate(2deg) scale(.94)}
+  }
+  @keyframes flow3{
+    0%{transform:translate3d(0,0,0) rotate(4deg) scale(.96)}
+    100%{transform:translate3d(5vw,-7vh,0) rotate(-6deg) scale(1.1)}
+  }
+  .bg .grid{
+    position:absolute;left:-34px;top:-34px;width:calc(100% + 68px);height:calc(100% + 68px);
+    background-image:
+      linear-gradient(rgba(120,200,255,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,200,255,.055) 1px,transparent 1px);
+    background-size:34px 34px;
+    animation:gridmove 18s linear infinite;will-change:transform;
+    -webkit-mask-image:radial-gradient(115% 68% at 50% 0,#000 0%,transparent 72%);
+    mask-image:radial-gradient(115% 68% at 50% 0,#000 0%,transparent 72%);
+  }
+  @keyframes gridmove{from{transform:translate3d(0,0,0)}to{transform:translate3d(34px,34px,0)}}
+  .bg .vig{
+    position:absolute;inset:0;
+    background:radial-gradient(125% 85% at 50% 18%,transparent 52%,rgba(0,0,0,.55) 100%);
+  }
+  .bg .scan{
+    position:absolute;inset:0;opacity:.55;
+    background:repeating-linear-gradient(0deg,rgba(180,230,255,.04) 0 1px,transparent 1px 4px);
+  }
+  .bg .sweep{
+    position:absolute;left:-20%;top:0;width:140%;height:38vh;will-change:transform;
+    background:linear-gradient(180deg,transparent,rgba(120,220,255,.055) 44%,rgba(139,108,246,.05) 56%,transparent);
+    animation:sweep 12s linear infinite;
+  }
+  @keyframes sweep{
+    0%{transform:translate3d(0,-46vh,0)}
+    100%{transform:translate3d(0,112vh,0)}
+  }
+  header,main,footer,nav{position:relative;z-index:1}
+  ::selection{background:rgba(62,230,240,.28);color:#fff}
+  header{
+    position:sticky;top:0;z-index:30;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;
+    background:linear-gradient(180deg,rgba(5,7,14,.94),rgba(5,7,14,.72));
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);overflow:hidden;
+  }
+  header::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:1px;opacity:.85;
+    background:linear-gradient(90deg,transparent,rgba(62,230,240,.85),rgba(139,108,246,.75),transparent);
+    background-size:220% 100%;
+    animation:lineflow 7s linear infinite;
+  }
+  @keyframes lineflow{
+    0%{background-position:-120% 0}
+    100%{background-position:220% 0}
+  }
+  .eyebrow{
+    display:flex;align-items:center;gap:7px;font-family:var(--mono);
+    font-size:10px;letter-spacing:.16em;color:#5f7ba3;margin-bottom:7px;
+  }
+  .dot{
+    display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);
+    box-shadow:0 0 8px var(--ok);animation:blink 2.4s ease-in-out infinite;flex:0 0 auto;
+  }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .eyebrow .grow{flex:1}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .top .l{display:flex;align-items:baseline;gap:10px;min-width:0}
+  #editBtn{
+    flex:0 0 auto;font:inherit;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    padding:6px 12px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line-2);background:rgba(62,230,240,.06);color:var(--accent);
+  }
+  #editBtn.on{
+    background:linear-gradient(135deg,var(--accent),#57b9ff);border-color:transparent;color:#04121a;
+    font-weight:700;box-shadow:0 0 18px rgba(62,230,240,.45);
+  }
+  h1{margin:0;font-size:16px;letter-spacing:.05em;font-weight:700;color:#eaf4ff}
+  h1::before{content:"◈";color:var(--accent);margin-right:7px;text-shadow:0 0 12px rgba(62,230,240,.8)}
+  .today{font-family:var(--mono);font-size:10.5px;color:#6ea8d8;white-space:nowrap;letter-spacing:.06em;margin-left:auto}
+  .clock{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em;
+    text-shadow:0 0 10px rgba(62,230,240,.55);margin-right:9px;white-space:nowrap}
+  .sub{font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6;letter-spacing:.02em}
+  nav{display:flex;gap:6px;overflow-x:auto;padding:11px 16px 12px;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{
+    flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+    padding:7px 13px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--sub);
+  }
+  nav button.on{
+    background:linear-gradient(135deg,var(--accent),#57b9ff);border-color:transparent;
+    color:#04121a;font-weight:700;box-shadow:0 0 16px rgba(62,230,240,.35);
+  }
+  main{max-width:640px;margin:0 auto;padding:2px 14px 20px}
+  .card{
+    background:linear-gradient(180deg,var(--card),var(--card-2));
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  #head{position:relative}
+  #head::before,#head::after{
+    content:"";position:absolute;width:9px;height:9px;pointer-events:none;opacity:.75;
+  }
+  #head::before{
+    left:6px;top:6px;border-left:1px solid rgba(62,230,240,.6);border-top:1px solid rgba(62,230,240,.6);
+    border-top-left-radius:5px;
+  }
+  #head::after{
+    right:6px;bottom:6px;border-right:1px solid rgba(139,108,246,.65);border-bottom:1px solid rgba(139,108,246,.65);
+    border-bottom-right-radius:5px;
+  }
+  .head{padding:17px 17px 16px}
+  .head .row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .head h2{
+    margin:0;font-size:18px;font-weight:700;letter-spacing:.06em;
+    background:linear-gradient(90deg,#f2f9ff,var(--accent));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .tag{
+    font-family:var(--mono);font-size:10px;letter-spacing:.08em;white-space:nowrap;
+    padding:4px 9px;border-radius:7px;color:#a9ecf5;
+    border:1px solid rgba(62,230,240,.32);background:rgba(62,230,240,.08);
+  }
+  .prog{margin-top:11px}
+  .prog .txt{display:flex;align-items:center;gap:8px;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.08em;color:#6ea8d8}
+  .prog .txt b{color:var(--accent);font-size:12px}
+  .bar{margin-top:7px;height:4px;border-radius:99px;background:rgba(120,190,255,.12);overflow:hidden}
+  .bar i{
+    display:block;height:100%;width:0;border-radius:99px;position:relative;overflow:hidden;
+    background:linear-gradient(90deg,var(--accent),#57b9ff,var(--vio));
+    box-shadow:0 0 12px rgba(62,230,240,.7);transition:width .28s ease;
+  }
+  .bar i::after{
+    content:"";position:absolute;inset:0;transform:translateX(-110%);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);
+    animation:sheen 2.8s ease-in-out infinite;
+  }
+  @keyframes sheen{
+    0%{transform:translateX(-110%)}
+    55%,100%{transform:translateX(230%)}
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:12px 0 0}
+  .chip{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:5px 9px;border-radius:7px;
+    color:#9fe8f2;border:1px solid rgba(62,230,240,.26);background:rgba(62,230,240,.07);
+  }
+  .chip.w{color:#b6c8ff;border-color:rgba(122,160,255,.38);background:rgba(90,140,255,.13)}
+  .tl{
+    margin-top:12px;display:flex;flex-direction:column;gap:8px;
+    background:none;border:0;border-radius:0;box-shadow:none;overflow:visible;
+  }
+  .r{
+    position:relative;display:grid;grid-template-columns:52px 1fr 26px;gap:10px;
+    padding:12px 13px;border:1px solid var(--line);border-radius:12px;
+    background:rgba(14,21,36,.62);overflow:hidden;
+  }
+  .r::before{
+    content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;border-radius:2px;
+    background:linear-gradient(180deg,transparent,rgba(62,230,240,.5),transparent);opacity:.3;
+  }
+  .t{
+    font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;
+    color:#7fb4dc;padding-top:2px;font-variant-numeric:tabular-nums;
+  }
+  .ti{font-size:14.5px;font-weight:600;line-height:1.35;color:#eaf3ff}
+  .no{font-size:12px;color:#8798b6;line-height:1.55;margin-top:3px}
+  .point .t{padding-top:1px}
+  .te{display:block;font-weight:500;font-size:10px;color:rgba(127,180,220,.62);margin-top:2px}
+  .body{min-width:0}
+  body.editmode .ck{display:none}
+  body.editmode .r{grid-template-columns:88px 1fr;background:rgba(87,185,255,.06);border-color:rgba(87,185,255,.28)}
+  body.editmode .r.now{background:rgba(87,185,255,.06)}
+  body.editmode .r.now .ti::after{display:none}
+  body.editmode .r .t,body.editmode .r .ti,body.editmode .r .no{
+    outline:1px dashed rgba(150,200,255,.22);outline-offset:2px;border-radius:5px;
+    min-height:18px;padding:1px 3px;background:rgba(0,0,0,.35)}
+  body.editmode .r .t:focus,body.editmode .r .ti:focus,body.editmode .r .no:focus{
+    outline:1px solid var(--accent);box-shadow:0 0 0 3px rgba(62,230,240,.16);background:rgba(0,0,0,.55)}
+  body.editmode .r .t{font-size:10.5px;white-space:nowrap}
+  body.editmode .tl{box-shadow:none}
+  .hint{font-size:11px;color:#7fe3ee;padding:10px 2px 0;line-height:1.6}
+  .ck{
+    appearance:none;-webkit-appearance:none;margin:2px 0 0;width:22px;height:22px;
+    border-radius:6px;border:1px solid rgba(110,190,255,.34);
+    background:rgba(8,14,26,.85);position:relative;cursor:pointer;
+  }
+  .ck:checked{
+    background:linear-gradient(135deg,var(--accent),#57b9ff);border-color:transparent;
+    box-shadow:0 0 14px rgba(62,230,240,.55);
+  }
+  .ck:checked::after{
+    content:"";position:absolute;left:6.5px;top:3px;width:5px;height:10px;
+    border:2px solid #04121a;border-top:0;border-left:0;transform:rotate(45deg);
+  }
+  .r.done{border-color:rgba(46,230,168,.26);background:rgba(12,24,26,.55)}
+  .r.done .ti{text-decoration:line-through;color:#6d7f9c}
+  .r.done .no{opacity:.45}
+  .r.done::before{background:linear-gradient(180deg,transparent,rgba(46,230,168,.55),transparent);opacity:.7}
+  .r.now{
+    border-color:rgba(62,230,240,.5);
+    background:linear-gradient(100deg,rgba(62,230,240,.13),rgba(139,108,246,.07) 70%,transparent);
+    animation:live 2.8s ease-in-out infinite;
+  }
+  .r.now::before{opacity:1;box-shadow:0 0 10px rgba(62,230,240,.8)}
+  .r.now .t{color:var(--accent)}
+  .r.now .ti::after{
+    content:"NOW";font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;
+    color:#04121a;background:linear-gradient(135deg,var(--accent),#57b9ff);
+    border-radius:5px;padding:2px 5px;margin-left:7px;vertical-align:2px;
+    box-shadow:0 0 12px rgba(62,230,240,.6);
+    animation:nowpulse 2.4s ease-in-out infinite;
+  }
+  @keyframes nowpulse{
+    0%,100%{box-shadow:0 0 10px rgba(62,230,240,.5)}
+    50%{box-shadow:0 0 20px rgba(62,230,240,.95),0 0 5px rgba(255,255,255,.7)}
+  }
+  @keyframes live{
+    0%,100%{box-shadow:0 0 0 1px rgba(62,230,240,.18),0 0 18px rgba(62,230,240,.10)}
+    50%{box-shadow:0 0 0 1px rgba(62,230,240,.42),0 0 26px rgba(62,230,240,.24)}
+  }
+  h3{
+    font-family:var(--mono);font-size:10.5px;font-weight:700;color:#7d93b3;
+    letter-spacing:.16em;margin:24px 2px 9px;
+  }
+  h3::before{content:"// ";color:var(--accent);opacity:.9}
+  ul{margin:0;padding:0 4px 0 18px;list-style:none}
+  li{position:relative;font-size:13px;line-height:1.7;color:#c3d2e8;margin-bottom:5px}
+  li::before{content:"▸";position:absolute;left:-15px;color:var(--accent);opacity:.7;font-size:11px}
+  li b{color:var(--accent)}
+  .wk{
+    display:flex;align-items:center;gap:11px;padding:12px 15px;font-size:13px;color:#c3d2e8;
+    border-top:1px dashed rgba(110,190,255,.14);
+  }
+  .wk:first-child{border-top:0}
+  .wk span{flex:1;line-height:1.45}
+  footer{
+    max-width:640px;margin:0 auto;padding:8px 16px calc(30px + env(safe-area-inset-bottom));
+    text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+    color:#5f7799;line-height:1.9;
+  }
+  .reset{
+    font:inherit;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    color:#8fb6d8;background:rgba(110,190,255,.06);border:1px solid var(--line);
+    border-radius:8px;padding:7px 11px;margin:6px 4px 0;cursor:pointer;
+  }
+  .reset:active{background:rgba(110,190,255,.14)}
+  @media (prefers-reduced-motion: reduce){
+    .bg *,.bar i::after,header::after,.dot,.r.now,.r.now .ti::after{animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <i class="band b1"></i>
+  <i class="band b2"></i>
+  <i class="band b3"></i>
+  <span class="grid"></span>
+  <span class="vig"></span>
+  <span class="scan"></span>
+  <span class="sweep"></span>
+</div>
+<header>
+  <div class="eyebrow"><i class="dot"></i><span>SYSTEM ONLINE</span><span class="grow"></span><span id="clock" class="clock"></span><span id="today" class="today"></span></div>
+  <div class="top">
+    <div class="l"><h1>Crispp 一周工作台</h1></div>
+    <button id="editBtn" type="button">编辑</button>
+  </div>
+  <div class="sub">银发社群 + AI 项目 ／ 22:30 上床 · 周一～周四晚不玩游戏 · 本周视频本周发</div>
+</header>
+<nav id="tabs"></nav>
+<main>
+  <div class="card" id="head"></div>
+  <div class="chips" id="chips" style="padding:12px 0 0"></div>
+  <div class="card tl" id="tl"></div>
+  <div class="hint" id="hint" hidden></div>
+
+  <h3>本周红线</h3>
+  <div class="card">
+    <label class="wk"><input type="checkbox" class="ck" id="wk-video"><span>本周视频本周发（周五前全部上线）</span></label>
+    <label class="wk"><input type="checkbox" class="ck" id="wk-club"><span>周五和股东同步成果 + 敲定下周计划</span></label>
+    <label class="wk"><input type="checkbox" class="ck" id="wk-ai"><span>本周至少沉淀 1 个漫剧脚本 + 1 套提示词模板</span></label>
+  </div>
+
+  <h3>优先级与兜底</h3>
+  <div class="card" style="padding:12px 15px">
+    <ul>
+      <li>优先级：<b>商务&amp;会员沟通</b> ＞ 短视频产出 ＞ AI 长线研究</li>
+      <li>周一上午有重要谈判 → 拍摄顺延周二上午，周二下午剪完发掉，保证本周上线</li>
+      <li>晨间轮换：周一三五晨练｜周二四看书，可随状态对调</li>
+      <li>周一～周四晚上禁止游戏，稳住早起节奏</li>
+      <li>周六常规不上课、不去俱乐部，仅临时紧急活动才去</li>
+    </ul>
+  </div>
+
+  <h3>游戏开放窗口</h3>
+  <div class="card" style="padding:12px 15px">
+    <ul>
+      <li>周五晚｜周六下午 + 晚上｜周日全天</li>
+      <li>工作日想要放松：换成喝茶、散步、看参考影片，不碰游戏</li>
+    </ul>
+  </div>
+
+  <footer>
+    纯本地页面，勾选和改动只存在这台手机上，每周一自动换新周<br>
+    <button class="reset" id="reset">清空本周勾选</button>
+    <button class="reset" id="resetEdit">恢复默认文字</button>
+  </footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var BASE = [
+    {id:"rise", t:"06:30", e:"06:45", title:"起床", note:"喝水洗漱"},
+    {id:"gold", t:"06:45", e:"07:45", title:"晨间黄金", note:"轮换：晨练 / 看书（围棋商务笔记）"},
+    {id:"meal", t:"07:45", e:"08:45", title:"早餐 + 喝茶", note:"写今日待办"},
+    {id:"go",   t:"08:45", e:"09:00", title:"收拾出门", note:"装好当天要带的东西"},
+    {id:"comm", t:"09:00", e:"09:15", title:"通勤", note:"出发，15 分钟到岗"},
+    {id:"job",  t:"09:15", e:"12:30", title:"在岗", note:""},
+    {id:"back", t:"12:30", e:"13:00", title:"回家", note:""},
+    {id:"lnch", t:"13:00", e:"13:30", title:"午饭", note:""},
+    {id:"nap",  t:"13:30", e:"14:00", title:"午休", note:"30 分钟"},
+    {id:"deep", t:"14:00", e:"17:30", title:"居家专注", note:""},
+    {id:"rest", t:"17:30", e:"18:30", title:"休息喝茶", note:"走动放松"},
+    {id:"dinn", t:"18:30", e:"19:30", title:"晚饭", note:""},
+    {id:"flex", t:"19:30", e:"21:20", title:"晚间弹性", note:""},
+    {id:"wind", t:"21:20", e:"22:00", title:"停脑 + 洗漱", note:"停止高强度用脑，远离短视频"},
+    {id:"slp",  t:"22:30", e:"23:59", title:"上床休息", note:"硬底线", point:true}
+  ];
+
+  var DAYS = [
+    {key:"mon", name:"周一", full:"周一", tag:"拍摄 + 剪辑启动日",
+     job:"对齐本周目标、梳理商务线索、拍本周短视频素材",
+     deep:"剪辑短视频、校对、排期发布（本周素材本周发）",
+     flex:"复盘商务，更新谈判速查卡", game:false},
+    {key:"tue", name:"周二", full:"周二", tag:"补拍 + 发布收尾日",
+     job:"会员沟通、商务回访；周一素材不足就补拍",
+     deep:"剩余视频剪辑、成片检查，全部本周内发布",
+     flex:"看对标账号，学习短视频选题口播", game:false},
+    {key:"wed", name:"周三", full:"周三", tag:"AI 沉淀日",
+     job:"和学员深度聊天，收集银发用户反馈，不拍摄",
+     deep:"研究 AI 视频工具、写漫剧脚本、打磨提示词",
+     flex:"读书（谈判、运营、管理）", game:false},
+    {key:"thu", name:"周四", full:"周四", tag:"AI 储备日",
+     job:"对接合作、社群维护、回访意向客户",
+     deep:"测试 AI 新功能、搭建提示词模板库",
+     flex:"休闲放松，二人世界", game:false},
+    {key:"fri", name:"周五", full:"周五", tag:"本周闭环 + 放松开启",
+     job:"收尾全部商务，和股东同步成果，敲定下周计划",
+     deep:"素材归档、整理文档、构思下周选题",
+     flex:"自由：游戏 / 二人世界 / 看书放空",
+     slp:"尽量不熬夜，最晚 23:00", game:true},
+    {key:"sat", name:"周六", full:"周六", tag:"居家学习 + 半天自由",
+     blocks:[
+       {id:"s1",  t:"06:30", e:"06:50", title:"起床", note:"比工作日松 30 分钟，喝水洗漱"},
+       {id:"s2",  t:"06:50", e:"07:50", title:"早餐 + 喝茶", note:"不赶时间，慢慢吃"},
+       {id:"s3",  t:"07:50", e:"08:00", title:"准备", note:"收拾桌面、倒杯水，进入状态"},
+       {id:"s4",  t:"08:00", e:"12:00", title:"居家学习", note:"看书、AI 脚本、提示词调试、项目研究"},
+       {id:"s5",  t:"12:00", e:"13:00", title:"午饭", note:""},
+       {id:"s6",  t:"13:00", e:"14:00", title:"午休 / 放空", note:"14:00 前不算自由时间"},
+       {id:"s7",  t:"14:00", e:"17:30", title:"自由时间", note:"游戏、散心、陪家人、二人世界"},
+       {id:"s8",  t:"17:30", e:"18:30", title:"休息喝茶", note:"走动放松"},
+       {id:"s9",  t:"18:30", e:"19:30", title:"晚饭", note:""},
+       {id:"s10", t:"19:30", e:"21:20", title:"自由时间", note:"游戏 / 看片 / 二人世界"},
+       {id:"s11", t:"21:20", e:"22:00", title:"停脑 + 洗漱", note:"远离短视频"},
+       {id:"s12", t:"22:30", e:"23:59", title:"上床休息", note:"周六可放宽到 23:00", point:true}
+     ], warn:"仅临时紧急活动，才去俱乐部", game:true},
+    {key:"sun", name:"周日", full:"周日", tag:"全天休息放空", soft:true,
+     blocks:[
+       {id:"u1",  t:"07:30", e:"08:30", title:"自然醒", note:"无闹钟，睡到醒为止"},
+       {id:"u2",  t:"08:30", e:"09:30", title:"早餐", note:"慢慢吃，喝杯茶"},
+       {id:"u3",  t:"09:30", e:"12:00", title:"自由放空", note:"喝茶、散步、看片，想干嘛干嘛"},
+       {id:"u4",  t:"12:00", e:"13:00", title:"午饭", note:""},
+       {id:"u5",  t:"13:00", e:"14:30", title:"午休 / 躺着", note:"不设闹钟"},
+       {id:"u6",  t:"14:30", e:"18:00", title:"自由放空", note:"陪家人、散心、游戏"},
+       {id:"u7",  t:"18:00", e:"19:00", title:"晚饭", note:""},
+       {id:"u8",  t:"19:00", e:"20:30", title:"自由放空", note:"游戏 / 看片 / 二人世界"},
+       {id:"u9",  t:"20:30", e:"21:00", title:"可选：20 分钟", note:"浏览下周待办，只列三件大事，不排细节"},
+       {id:"u10", t:"21:00", e:"22:30", title:"自由放空", note:"慢慢收心，不安排任务"},
+       {id:"u11", t:"22:30", e:"23:59", title:"上床休息", note:"为周一收心", point:true}
+     ], warn:"周日不补工作日欠下的活，欠了就砍事", game:true}
+  ];
+
+  // 通用作息单独一页，内容与你给的原文逐条对齐
+  DAYS.push({
+    key:"gen", name:"通用", full:"每日通用作息", tag:"周一～周五", generic:true,
+    blocks: BASE.map(function(b){
+      var c = {id:b.id, t:b.t, e:b.e, title:b.title, note:b.note, point:b.point};
+      if(b.id==="job")  c.note = "会员交流、股东同步、商务对接、视频拍摄（周一/周二上午）";
+      if(b.id==="deep") c.note = "周一/周二：剪辑发布｜周三/周四：AI 深耕｜周五：归档选题";
+      if(b.id==="flex") c.note = "AI 复盘 / 读书 / 看参考影片 / 和爱人喝茶二人世界";
+      return c;
+    })
+  });
+
+  var TABS = DAYS.map(function(d){ return d.name; });
+  var state = {day:0};
+  var EDIT = false;
+
+  function pad(n){ return n<10 ? "0"+n : ""+n; }
+  function ymd(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate()); }
+
+  // ISO week key, resets every Monday
+  function weekKey(d){
+    var t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var day = (t.getDay()+6)%7;               // Mon=0
+    t.setDate(t.getDate()-day+3);             // Thursday of this week
+    var firstThu = new Date(t.getFullYear(),0,4);
+    var fday = (firstThu.getDay()+6)%7;
+    firstThu.setDate(firstThu.getDate()-fday+3);
+    var wk = 1 + Math.round((t-firstThu)/(7*864e5));
+    return t.getFullYear()+"-W"+pad(wk);
+  }
+
+  var WK = weekKey(new Date());
+  var NS = "crispp.v2."+WK+".";
+
+  function get(id){
+    try { return localStorage.getItem(NS+id) === "1"; } catch(e){ return false; }
+  }
+  function set(id,on){
+    try { on ? localStorage.setItem(NS+id,"1") : localStorage.removeItem(NS+id); } catch(e){}
+  }
+  function mins(hhmm){
+    if(!/^\d\d:\d\d$/.test(hhmm)) return -1;
+    var p = hhmm.split(":");
+    return (+p[0])*60 + (+p[1]);
+  }
+
+  function esc(s){
+    return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  var NS_EDIT = "crispp.edit.v1.";   // 文字改动跨周保留
+  function ovKey(dayKey,id){ return dayKey+"."+id; }
+  function getOv(dayKey,id){
+    try{ var s = localStorage.getItem(NS_EDIT+ovKey(dayKey,id)); return s ? JSON.parse(s) : null; }
+    catch(e){ return null; }
+  }
+  function setOv(dayKey,id,o){
+    try{
+      if(o) localStorage.setItem(NS_EDIT+ovKey(dayKey,id), JSON.stringify(o));
+      else localStorage.removeItem(NS_EDIT+ovKey(dayKey,id));
+    }catch(e){}
+  }
+
+  function blocksOf(day){
+    var list;
+    if(day.blocks){
+      list = day.blocks.map(function(b){ return {id:b.id,t:b.t,e:b.e,title:b.title,note:b.note,point:b.point}; });
+    }else{
+      list = BASE.map(function(b){
+        var c = {id:b.id, t:b.t, e:b.e, title:b.title, note:b.note, point:b.point};
+        if(b.id==="job"  && day.job)  c.note = day.job;
+        if(b.id==="deep" && day.deep) c.note = day.deep;
+        if(b.id==="flex" && day.flex) c.note = day.flex;
+        if(b.id==="slp"  && day.slp)  c.note = day.slp;
+        return c;
+      });
+    }
+    return list.map(function(c){
+      var o = getOv(day.key, c.id);
+      if(!o) return c;
+      return {
+        id:c.id, point:c.point,
+        t: o.t || c.t,
+        e: (o.e === undefined ? c.e : o.e),
+        title: o.title || c.title,
+        note: (o.note === undefined ? c.note : o.note)
+      };
+    });
+  }
+
+  function renderTabs(){
+    var nav = document.getElementById("tabs");
+    nav.innerHTML = "";
+    DAYS.forEach(function(d,i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = d.name;
+      if(i===state.day) b.className = "on";
+      b.onclick = function(){ state.day = i; render(); window.scrollTo({top:0,behavior:"smooth"}); };
+      nav.appendChild(b);
+    });
+  }
+
+  function render(){
+    var now = new Date();
+    var todayIdx = (now.getDay()+6)%7;
+    document.getElementById("today").textContent =
+      (now.getMonth()+1)+"月"+now.getDate()+"日 · "+DAYS[todayIdx].name+" · 本周 "+WK.slice(-3);
+
+    renderTabs();
+
+    document.body.classList.toggle("editmode", EDIT);
+    var eb = document.getElementById("editBtn");
+    eb.textContent = EDIT ? "完成" : "编辑";
+    eb.classList.toggle("on", EDIT);
+    var hint = document.getElementById("hint");
+    if(hint){
+      hint.hidden = !EDIT;
+      hint.textContent = "直接点文字就能改：时间写成 09:00-12:30，标题和说明随意改，点别处自动保存。";
+    }
+
+    var day = DAYS[state.day];
+    var blocks = blocksOf(day);
+
+    var head = document.getElementById("head");
+    var h = '<div class="head"><div class="row1"><h2>'+day.full+'</h2><span class="tag">'+day.tag+'</span></div>';
+    h += '<div class="prog" id="prog"><div class="txt">完成 <b id="pDone">0</b> / <span id="pTotal">0</span>　·　自动保存</div>'+
+         '<div class="bar"><i id="pBar"></i></div></div></div>';
+    head.innerHTML = h;
+    document.getElementById("pTotal").textContent = blocks.length;
+
+    var chips = document.getElementById("chips");
+    var ch;
+    if(day.generic){
+      ch = ['22:30 上床','06:30 起床','午休 30 分钟','晨间轮换：一三五晨练｜二四看书'];
+    }else if(day.soft){
+      ch = ['全天休息','不设闹钟','只做可选那 20 分钟','22:30 收心'];
+    }else{
+      ch = ['22:30 上床','早起','本周视频本周发'];
+      if(!day.game) ch.unshift('今晚不玩游戏');
+      ch.push(day.game ? '游戏窗口开放' : '剪辑日：别拖到周三');
+    }
+    chips.innerHTML = ch.map(function(c,i){
+      var w = (i===ch.length-1 && !day.game) || (day.game && i===ch.length-1);
+      return '<span class="chip'+(w?' w':'')+'">'+c+'</span>';
+    }).join("");
+
+    var tl = document.getElementById("tl");
+    tl.innerHTML = "";
+    var done = 0, total = 0;
+
+    blocks.forEach(function(b){
+      var id = day.key+"."+b.id;
+      var row = document.createElement("div");
+      row.className = "r" + (b.point ? " point" : "");
+      var nowM = now.getHours()*60 + now.getMinutes();
+      var isNow = (state.day===todayIdx) && b.e && mins(b.t)>=0 &&
+                  nowM >= mins(b.t) && nowM < mins(b.e);
+      if(isNow) row.className += " now";
+
+      var timeTxt = b.t + (b.e ? '<span class="te">'+b.e+'</span>' : '');
+      var checked = get(id);
+      var noteHtml = (EDIT || b.note) ? '<div class="no">'+esc(b.note)+'</div>' : '';
+      row.innerHTML = '<div class="t">'+timeTxt+'</div>'+
+        '<div class="body"><div class="ti">'+esc(b.title)+'</div>'+noteHtml+'</div>'+
+        '<input type="checkbox" class="ck" aria-label="'+esc(b.title)+'">';
+      row.dataset.id = b.id;
+      var box = row.querySelector(".ck");
+      box.checked = checked;
+      if(checked) row.classList.add("done");
+      total++; if(checked) done++;
+      box.onchange = function(){
+        set(id, box.checked);
+        row.classList.toggle("done", box.checked);
+        updateProg();
+      };
+
+      if(EDIT){
+        row.classList.add("editing");
+        var tEl = row.querySelector(".t");
+        var tiEl = row.querySelector(".ti");
+        var noEl = row.querySelector(".no");
+        if(noEl && !noEl.textContent.trim()) noEl.textContent = "";
+        tEl.textContent = b.t + (b.e ? "-"+b.e : "");
+        [tEl, tiEl].concat(noEl ? [noEl] : []).forEach(function(el){
+          el.setAttribute("contenteditable","true");
+          el.setAttribute("enterkeyhint","done");
+          el.spellcheck = false;
+        });
+        row.addEventListener("focusout", function(){
+          var tv = tEl.textContent.trim();
+          var m = tv.match(/(\d{1,2}:\d{2})\s*[-–—~～至到]+\s*(\d{1,2}:\d{2})/);
+          var t1 = m ? m[1] : ((tv.match(/\d{1,2}:\d{2}/)||[])[0] || b.t);
+          var e1 = m ? m[2] : "";
+          var title1 = tiEl.textContent.trim() || b.title;
+          var note1 = noEl ? noEl.textContent.trim() : "";
+          setOv(day.key, b.id, {t:t1, e:e1, title:title1, note:note1});
+        });
+      }
+      tl.appendChild(row);
+    });
+
+    if(day.warn && !EDIT){
+      var w = document.createElement("div");
+      w.className = "r point";
+      w.innerHTML = '<div class="t">!</div><div class="body"><div class="ti">例外</div><div class="no">'+esc(day.warn)+'</div></div><div></div>';
+      tl.appendChild(w);
+    }
+
+    function updateProg(){
+      var boxes = tl.querySelectorAll(".ck");
+      var d=0; boxes.forEach(function(x){ if(x.checked) d++; });
+      var pd = document.getElementById("pDone");
+      var pb = document.getElementById("pBar");
+      if(pd) pd.textContent = d;
+      if(pb) pb.style.width = (total ? Math.round(d*100/total) : 0) + "%";
+    }
+    updateProg();
+
+    var wkIds = ["wk-video","wk-club","wk-ai"];
+    wkIds.forEach(function(k){
+      var el = document.getElementById(k);
+      el.checked = get(k);
+      el.onchange = function(){ set(k, el.checked); };
+    });
+  }
+
+  document.getElementById("editBtn").onclick = function(){
+    EDIT = !EDIT;
+    render();
+  };
+
+  function clearKeys(matchEdit){
+    var base = matchEdit ? NS_EDIT : NS;
+    try{
+      var kill = [];
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i);
+        if(k && k.indexOf(base)===0) kill.push(k);
+      }
+      kill.forEach(function(k){ localStorage.removeItem(k); });
+    }catch(e){}
+  }
+
+  document.getElementById("reset").onclick = function(){
+    if(!confirm("清空本周所有勾选？（你改过的文字会保留）")) return;
+    clearKeys(false);
+    render();
+  };
+
+  document.getElementById("resetEdit").onclick = function(){
+    if(!confirm("把本周改过的文字恢复成默认安排？")) return;
+    clearKeys(true);
+    render();
+  };
+
+  function tickClock(){
+    var el = document.getElementById("clock");
+    if(!el) return;
+    var n = new Date();
+    el.textContent = pad(n.getHours())+":"+pad(n.getMinutes());
+  }
+
+  var todayIdx = (new Date().getDay()+6)%7;
+  state.day = todayIdx;
+  render();
+  tickClock();
+  setInterval(tickClock, 20000);
+})();
+</script>
+</body>
+</html>
